@@ -1,0 +1,51 @@
+/* .form-control{
+  width: 300px !important;
+} */
+.rounded-image {
+  border-radius: 5%;
+  /* Hoặc giá trị cụ thể để làm tròn theo ý muốn, ví dụ: */
+  /* border-radius: 10px; */
+}
+
+.helvetica-text {
+  font-family: "Helvetica", Arial, sans-serif;
+}
+
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  /* justify-content: space-between; */
+  list-style: none;
+  padding: 0;
+}
+
+.product-item {
+  width: 30%; /* Điều chỉnh chiều rộng của mỗi sản phẩm */
+  margin-bottom: 20px; /* Khoảng cách giữa các sản phẩm */
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.btn {
+  margin: 0 20px; /* Khoảng cách giữa các nút */
+  /* padding: auto; */
+  padding: 10px 15px;
+}
+
+.custom-carousel {
+  margin: 0 auto;
+  width: 80%;
+  object-fit: cover; 
+  /* height: 300px; */
+}
+.orderlist{
+  margin-bottom: 500px;
+}
+/* ul {
+  list-style-type: none !important;
+} */
+.transparent-modal .modal-content {
+  background-color: white;
+  border: none;
+}
