@@ -1,9 +1,9 @@
-import { SendEmailCommand } from "@aws-sdk/client-ses";
 import * as config from "../config.js";
 import { hashPassword, comparePassword } from "../helpers/auth.js";
 import User from "../models/auth.js";
 import { nanoid } from "nanoid";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 export const tokenAndUserResponse = (req, res, user) => {
   // create token
@@ -22,6 +22,7 @@ export const tokenAndUserResponse = (req, res, user) => {
     user,
     token: jwtToken,
     refreshToken,
+    role: user.role[0],
   });
 };
 // import { sesClient } from "@aws-sdk/client-ses";
@@ -33,38 +34,104 @@ export const welcome = (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { email, password,phone } = req.body;
+    const { email, password, phone } = req.body;
 
-    // important - check if user with that email already exist?
-    const user = await User.findOne({ email });
-    if (user) {
-      return res.json({ error: "Email is already registered" });
+    const userExist = await User.findOne({ email });
+    if (userExist) {
+      return res.status(400).json({ error: "Email is already registered" });
     }
+
     if (password && password.length < 6) {
-      return res.json({
+      return res.status(400).json({
         error: "Password should be at least 6 characters long",
       });
     }
 
-    const userCheck = await User.findOne({ email });
+    const hashedPassword = await hashPassword(password);
+    const newUser = new User({
+      username: nanoid(6),
+      email,
+      password: hashedPassword,
+      phone,
+    });
 
-    if (!userCheck) {
-      const hashedPassword = await hashPassword(password);
-      // create user and save
-      const user = await new User({
-        username: nanoid(6),
-        email,
-        password: hashedPassword,
-        phone
-      }).save();
+    await newUser.save();
 
-      tokenAndUserResponse(req, res, user);
-    } else {
-      return res.json({ error: "Email is taken" });
+    // Gửi email
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: config.EMAIL_FROM, // Email người gửi
+        pass: config.EMAIL_PASS, // Mật khẩu hoặc mật khẩu ứng dụng
+      },
+    });
+
+    let mailOptions = {
+      from: "xuantuyenqwerty@gmail.com", // Địa chỉ email người gửi
+      to: email, // Email người nhận được từ request
+      subject: "Đăng ký tài khoản thành công",
+      // text: "Chào mừng bạn đã đăng ký thành công!",
+      html: `
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chúc mừng bạn đã đăng ký thành công!</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
+    .container {
+      text-align: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #333;
+    }
+    p {
+      margin-bottom: 15px;
+    }
+    .continue-button {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .continue-button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Chào mừng bạn đã đến với website của chúng tôi !</h2>
+    <p>Xin chào <strong>${email}</strong>,</p>
+    <p>Cám ơn bạn đã đăng ký dịch vụ của chúng tôi. Thân ái !</p>
+    <p>Hãy nhấn nút bên dưới để tiếp tục.</p>
+    <a href="http://localhost:3000/" class="continue-button">Tiếp tục</a>
+  </div>
+</body>
+</html>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    tokenAndUserResponse(req, res, newUser);
   } catch (error) {
     console.log(error);
-    res.json("Something went wrong !");
+    return res.json({ err: "Something went wrong !" });
   }
 };
 
@@ -109,7 +176,12 @@ export const currentUser = async (req, res) => {
     const user = await User.findById(req.user._id);
     user.password = undefined;
     user.resetCode = undefined;
-    res.json(user);
+    console.log("===> ", user)
+    // res.json(user);
+    return res.json({
+      user,
+      role: user.role[0],
+    });
   } catch (err) {
     console.log(err);
     return res.status(403).json({ error: "Unauthorized" });
@@ -119,6 +191,17 @@ export const currentUser = async (req, res) => {
 export const publicProfile = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
+    user.password = undefined;
+    user.resetCode = undefined;
+    res.json(user);
+  } catch (err) {
+    console.log(err);
+    return res.status(403).json({ error: err });
+  }
+};
+export const AdminPublicProfile = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.idUser });
     user.password = undefined;
     user.resetCode = undefined;
     res.json(user);
@@ -179,3 +262,44 @@ export const updateProfile = async (req, res) => {
     }
   }
 };
+export const adminUpdateUser = async (req, res) => {
+  try {
+    const { idUser } = req.params;
+
+    const user = await User.findByIdAndUpdate(
+      idUser,
+      {
+        ...req.body,
+      },
+      { new: true }
+    );
+
+    user.password = undefined;
+    user.resetCode = undefined;
+    res.json(user);
+  } catch (err) {
+    console.log(err);
+    if (err.codeName === "DuplicateKey") {
+      return res.status(403).json({ error: "Username is taken" });
+    } else {
+      return res.status(403).json({ error: "Unauhorized" });
+    }
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const user = await User.find({})
+
+    user.password = undefined;
+    user.resetCode = undefined;
+    res.json(user);
+  } catch (err) {
+    console.log(err);
+    if (err.codeName === "DuplicateKey") {
+      return res.status(403).json({ error: "Username is taken" });
+    } else {
+      return res.status(403).json({ error: "Unauhorized" });
+    }
+  }
+}

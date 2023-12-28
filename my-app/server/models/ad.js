@@ -67,7 +67,6 @@
 // export default model("Ad", adSchema)
 
 import mongoose from 'mongoose';
-// import User from '../models/auth';
 const CourseSchema = new mongoose.Schema({
   name: String,
   description: String,
@@ -79,7 +78,8 @@ const CourseSchema = new mongoose.Schema({
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  linkCourse: String,
 });
 
 const Course = mongoose.model('Course', CourseSchema);

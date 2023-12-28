@@ -21,19 +21,7 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await axios.get(`getAllCourseById`);
-  //       // setCourses(res.data); // Lưu dữ liệu từ API vào state
-  //       // console.log("data id", res.data);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
 
-  //   fetchData();
-  // }, [courses]);
 
   const removeCourse = async (idCourse) => {
     // Xử lý logic xoá sản phẩm khỏi giỏ hàng
@@ -96,17 +84,17 @@ export default function Dashboard() {
                         <Modal.Title>Modal Title</Modal.Title>
                       </Modal.Header>
                       <Modal.Body>
-                        <p>Modal content goes here.</p>
+                        <p>Are you sure to delete this course ?</p>
                       </Modal.Body>
                       <Modal.Footer>
-                        <Button variant="secondary" onClick={handleClose}>
+                        <Button variant="dark" onClick={handleClose}>
                           Close
                         </Button>
                         <Button
                           variant="primary"
                           onClick={() => removeCourse(course._id)}
                         >
-                          Save Changes
+                          Yes
                         </Button>
                       </Modal.Footer>
                     </Modal>

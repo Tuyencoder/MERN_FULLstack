@@ -23,7 +23,7 @@ export default function Login() {
         email,
         password,
       });
-      // console.log(data);
+      
       if (data?.error) {
         toast.error(data?.error);
         setLoading(false);
@@ -32,7 +32,14 @@ export default function Login() {
         localStorage.setItem("auth", JSON.stringify(data));
         setLoading(true);
         toast.success("Login successful");
-        navigate("/");
+        console.log('data',data)
+        if(data.role === "Admin") {
+          navigate("/admin/dashboard");
+        }
+        else{
+          navigate("/");
+        }
+        
       }
     } catch (err) {
       console.log(err);

@@ -15,12 +15,21 @@ import Cart from "./pages/Cart.js";
 import Order from "./pages/Order.js";
 import DetailCourse from "./pages/DetailCourse.js";
 import Footer from "./pages/Footer.js";
-// import Slider from "./pages/Slider.js";
+import AdminDashboard from "./pages/admin/Dashboard.js";
+import AdminRoute from "./components/routes/AdminRoute.js";
+import UserProfile from "./pages/user/Profile.js";
 import EditCourse from "./pages/EditCourse.js";
-import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import AdminEditUser from "./pages/admin/EditUser.js";
+import Payment from "./pages/user/Payment.js";
+import PaymentReturn from "./pages/user/PaymentReturn.js";
+import LearningPathPage from "./pages/LearningPathPage.js";
+import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 // <!-- Link trực tiếp từ Google Fonts -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+/>;
 
 export default function App() {
   return (
@@ -33,8 +42,12 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/CourseDetails/:idCourse" element={<DetailCourse />} />
+          <Route path="/learning" element={<LearningPathPage />} />
           <Route path="/" element={<PrivateRoute />}>
+            <Route path="profile/:idUser" element={<UserProfile />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="Payment" element={<Payment />} />
+            <Route path="vnpay_return" element={<PaymentReturn />} />
             <Route path="ad/create" element={<AdCreate />} />
             <Route path="edit/:idCourse" element={<EditCourse />} />
             <Route path="ad/create/sell/House" element={<SellHouse />} />
@@ -42,10 +55,15 @@ export default function App() {
             <Route path="/Cart" element={<Cart />} />
             <Route path="/Order" element={<Order />} />
           </Route>
+
+          <Route path="/admin" element={<AdminRoute />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="update-user/:idUser" element={<AdminEditUser />} />
+            {/* Thêm các Route khác cho Admin ở đây nếu cần */}
+          </Route>
         </Routes>
-        
       </AuthProvider>
-      <Footer/>
+      <Footer />
     </BrowserRouter>
   );
 }

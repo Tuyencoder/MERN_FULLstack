@@ -41,7 +41,7 @@ export default function Home() {
   return (
     <>
     <SimpleSlider />
-      <div className="mt-4 ml-4" style={{height:'70vh'}} >
+      <div className="mt-4 ml-4"  >
         
         {/* <pre>{JSON.stringify(auth, null, 4)}</pre> */}
         <h2>
@@ -53,7 +53,7 @@ export default function Home() {
       <ul className="product-list">
         {courses.map((course, index) => (
           <li className="" key={index}>
-            <div className="card mt-4 ml-5" style={{  width: "28rem" }}>
+            <div className="card mt-4 ml-5 mb-4" style={{  width: "28rem" }}>
               {/* <img className="card-img-top" src="..." alt="Card image cap" /> */}
               {course.image && (
                 <div className="image-container">
@@ -72,7 +72,7 @@ export default function Home() {
                 </a>
                 
                 {/* <p className="text-container">{course.description}</p> */}
-                <p className="card-text">Giá: {course.price} vnd</p>
+                <p className="card-text">Giá: <strong>{course.price}</strong>  vnd</p>
                 <p className="card-text">
                   <i>
                     Đăng bởi : {course.postedBy.email}

@@ -2,7 +2,7 @@ import Course from "../models/ad.js"
 export const getAllCourse = async ( req, res) =>{
         try {
             // Course.find({})
-            const course = await Course.find().populate('image').populate('postedBy', 'username email'); // Populate để lấy thông tin ảnh và người đăng
+            const course = await Course.find({}).populate('image').populate('postedBy', 'username email'); // Populate để lấy thông tin ảnh và người đăng
             return res.json(course);
         } catch (error) {
             console.log(error)
@@ -40,12 +40,6 @@ export const deleteCourse = async ( req, res) =>{
     try {
       // Xóa sản phẩm từ giỏ hàng dựa trên _id của sản phẩm
        await Course.findOneAndDelete({_id: idCourse});
-  
-      // if (!deletedProduct) {
-  
-      //   return res.status(404).json({ message: 'Product not found in cart' });
-      // }
-        console.log("hello")
       return res
         .status(200)
         .json({ message: "Product removed from cart successfully" });

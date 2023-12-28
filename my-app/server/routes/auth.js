@@ -18,4 +18,10 @@ router.put("/update-password", requireSignin, auth.updatePassword);
 
 router.put("/update-profile", requireSignin, auth.updateProfile);
 
+router.put("/admin-update-profile/:idUser", requireSignin, auth.adminUpdateUser);
+
+router.get('/admin-public-profile/:idUser',requireSignin, auth.AdminPublicProfile);
+
+router.get('/getAllUsers', requireSignin, auth.getAllUsers)
+
 export default router; 

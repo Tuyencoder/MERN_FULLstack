@@ -29,7 +29,7 @@ router.post('/create-course', upload.single('image'), async (req, res) => {
       return res.status(400).send('No image file uploaded.');
     }
 
-    const {userID, name, description, price } = req.body;
+    const {userID, name, description, price,linkCourse } = req.body;
 
     const { filename, originalname, path, size, mimetype } = req.file;
     const image = new Image({
@@ -47,6 +47,7 @@ router.post('/create-course', upload.single('image'), async (req, res) => {
       price,
       image: image._id,
       postedBy: userID,
+      linkCourse
     });
     await course.save();
 

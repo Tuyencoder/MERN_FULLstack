@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useAuth } from '../../context/auth'
 import { useNavigate } from "react-router-dom";
-const CreatCourse = () => {
+
+const CreateCourse = () => {
   const [auth, setAuth] = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -10,8 +11,9 @@ const CreatCourse = () => {
   const [file, setFile] = useState(null);
   const [previewURL, setPreviewURL] = useState(null);
   const [userID,setUserID] = useState(`${auth.user._id}`);
-
+  const [linkCourse, setLinkCourse] = useState("");
   const navigate = useNavigate();
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
@@ -35,10 +37,9 @@ const CreatCourse = () => {
     formData.append("name", name);
     formData.append("description", description);
     formData.append("price", price);
+    formData.append("linkCourse", linkCourse);
 
     try {
-      console.log(userID);
-      console.log(formData);
       const response = await axios.post("/create-course", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -46,39 +47,45 @@ const CreatCourse = () => {
       });
       
       console.log("Course created:", response.data);
-      navigate('/')
+      navigate('/');
     } catch (error) {
       console.error("Error creating course:", error);
     }
   };
 
   return (
-    <div className="create-product-container">
-      <h2>Create Course</h2>
-      <form onSubmit={handleSubmit} className="product-form">
-       
-        {/* Các input cho sản phẩm */}
-        <div className="input-group">
-          <label>Choose Image:</label>
-          <input type="file" onChange={handleFileChange} />
-
-          {previewURL && <img src={previewURL} alt="Preview" style={{ width: '50px', height: '50px' }} />}
+    <div className="container mt-4 mb-4">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <h2 className="mb-4">Create Course</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Choose Image:</label>
+              <input type="file" className="form-control-file" onChange={handleFileChange} />
+              {previewURL && <img src={previewURL} alt="Preview" className="mt-2 img-fluid" />}
+            </div>
+            <div className="form-group">
+              <label>Name:</label>
+              <input type="text" className="form-control form-control-lg" value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Description:</label>
+              <input type="text" className="form-control form-control-lg" value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Price:</label>
+              <input type="text" className="form-control form-control-lg" value={price} onChange={(e) => setPrice(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Link Course:</label>
+              <input type="text" className="form-control form-control-lg" value={linkCourse} onChange={(e) => setLinkCourse(e.target.value)} />
+            </div>
+            <button type="submit" className="btn btn-primary btn-sm">Create Course</button>
+          </form>
         </div>
-        <div className="input-group">
-          <label>Name:</label>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
-        <div className="input-group">
-          <label>Description:</label>
-          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
-        </div>
-        <div className="input-group">
-          <label>Price:</label>
-          <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} />
-        </div>
-        <button type="submit" className="submit-button">Create Course</button>
-      </form>
+      </div>
     </div>
   );
 }
-export default CreatCourse;
+
+export default CreateCourse;

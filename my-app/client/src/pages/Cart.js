@@ -67,6 +67,7 @@ function Cart() {
         console.log(response.data.message);
         updateItemCount();
         toast.success("Order successful");
+        navigate('/Payment')
       })
       .catch((error) => {
         console.error("Error order course from cart:", error);

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export default function EditCourse() {
+const EditCourse = () => {
   const [course, setCourse] = useState({});
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -11,12 +11,18 @@ export default function EditCourse() {
   const [file, setFile] = useState(null);
   const [previewURL, setPreviewURL] = useState(null);
   const { idCourse } = useParams();
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`/detail/${idCourse}`);
-        setCourse(res.data); // Lưu dữ liệu từ API vào state
-        console.log(res.data);
+        const response = await axios.get(`/detail/${idCourse}`);
+        const { data } = response;
+
+        setCourse(data);
+        setName(data.name);
+        setDescription(data.description);
+        setPrice(data.price);
       } catch (error) {
         console.log(error);
       }
@@ -24,7 +30,6 @@ export default function EditCourse() {
 
     fetchData();
   }, [idCourse]);
-  console.log("idCourse", idCourse);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -44,72 +49,57 @@ export default function EditCourse() {
     e.preventDefault();
 
     const formData = new FormData();
-    // formData.append("userID", userID);
     formData.append("image", file);
     formData.append("name", name);
     formData.append("description", description);
     formData.append("price", price);
 
-    console.log("formData", formData);
     try {
-      // console.log(userID);
-      console.log(formData);
       const response = await axios.put(`/edit/${idCourse}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      console.log("Course created:", response.data);
-      // navigate('/')
+      console.log("Course updated:", response.data);
+      toast.success("Update Success");
+      navigate('/dashboard');
     } catch (error) {
-      console.error("Error creating course:", error);
+      console.error("Error updating course:", error);
     }
   };
 
-
   return (
-    <div
-      className="create-product-container offset-md-4 mt-4 "
-      style={{ height: "500px" }}
-    >
-      <h2>Edit Course</h2>
-      <form onSubmit={handleSubmit} className="product-form ">
-        {/* Các input cho sản phẩm */}
-        <div className="input-group">
-          <label>Choose Image:</label>
-          <input type="file" onChange={handleFileChange} />
+    <div className="container mt-4 mb-4">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <h2>Edit Course</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Choose Image:</label>
+              <input type="file" className="form-control-file" onChange={handleFileChange} />
+            </div>
+            <div className="form-group">
+              <label>Name:</label>
+              <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Description:</label>
+              <input type="text" className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Price:</label>
+              <input type="text" className="form-control" value={price} onChange={(e) => setPrice(e.target.value)} />
+            </div>
+            <button onClick={() => navigate('/dashboard')} className="btn btn-info">Back</button>
 
-          {/* {previewURL && <img src={previewURL} alt="Preview" style={{ width: '50px', height: '50px' }} />} */}
+            <button   type="submit" className="btn btn-primary">Save</button>
+
+            
+          </form>
         </div>
-        <div className="input-group">
-          <label>Name:</label>
-          <input
-            type="text"
-            defaultValue={course.name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div className="input-group">
-          <label>Description:</label>
-          <input
-            type="text"
-            defaultValue={course.description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-        <div className="input-group">
-          <label>Price:</label>
-          <input
-            type="text"
-            defaultValue={course.price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-        </div>
-        <button type="submit" className="submit-button">
-          Save
-        </button>
-      </form>
+      </div>
     </div>
   );
-}
+};
+
+export default EditCourse;

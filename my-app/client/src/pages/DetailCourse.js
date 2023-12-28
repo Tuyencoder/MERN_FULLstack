@@ -39,7 +39,7 @@ export default function DetailCourse() {
       <div className="row gx-4 gx-lg-5 align-items-center">
         <div className="col-md-6">
         <img
-        className="card-img-top mb-5 mb-md-0"
+        className=" card card-img-top mb-5 mb-md-0 rounded-image"
         src={`http://localhost:8000/image/${course?.image?.filename}`  
         }
         alt="..."
@@ -58,7 +58,7 @@ export default function DetailCourse() {
               className="form-control text-center me-3"
               id="inputQuantity"
               type="num"
-              defaultValue={1}
+              // defaultValue={1}
               style={{ maxWidth: "3rem" }}
             />
             <button
