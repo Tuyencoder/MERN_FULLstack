@@ -32,32 +32,19 @@ export const welcome = (req, res) => {
   });
 };
 
-export const register = async (req, res) => {
+export const preRegisrer = async (req, res) => {
   try {
-    const { email, password, phone } = req.body;
+    const { email, password } = req.body;
 
     const userExist = await User.findOne({ email });
     if (userExist) {
       return res.status(400).json({ error: "Email is already registered" });
     }
 
-    if (password && password.length < 6) {
-      return res.status(400).json({
-        error: "Password should be at least 6 characters long",
-      });
-    }
-
-    const hashedPassword = await hashPassword(password);
-    const newUser = new User({
-      username: nanoid(6),
-      email,
-      password: hashedPassword,
-      phone,
+    const token = jwt.sign({ email, password }, config.JWT_SECRET, {
+      expiresIn: "1d",
     });
-
-    await newUser.save();
-
-    // Gửi email
+    //send mail
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -119,8 +106,8 @@ export const register = async (req, res) => {
     <h2>Chào mừng bạn đã đến với website của chúng tôi !</h2>
     <p>Xin chào <strong>${email}</strong>,</p>
     <p>Cám ơn bạn đã đăng ký dịch vụ của chúng tôi. Thân ái !</p>
-    <p>Hãy nhấn nút bên dưới để tiếp tục.</p>
-    <a href="http://localhost:3000/" class="continue-button">Tiếp tục</a>
+    <p>Hãy nhấn nút bên dưới để tiếp tục đăng kí </p>
+    <a href="${config.CLIENT_URL}/auth/account-active/${token}" class="continue-button">Hoàn tất đăng kí</a>
   </div>
 </body>
 </html>
@@ -128,6 +115,33 @@ export const register = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
+
+    res.json("Sent mail successfully");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const register = async (req, res) => {
+  try {
+    const { email, password } = jwt.verify(req.body.token, config.JWT_SECRET);
+
+    console.log("check mail and password", email, password);
+    if (password && password.length < 6) {
+      return res.status(400).json({
+        error: "Password should be at least 6 characters long",
+      });
+    }
+
+    const hashedPassword = await hashPassword(password);
+    const newUser = new User({
+      username: nanoid(6),
+      email,
+      password: hashedPassword,
+    });
+
+    await newUser.save();
+
     tokenAndUserResponse(req, res, newUser);
   } catch (error) {
     console.log(error);
@@ -176,7 +190,7 @@ export const currentUser = async (req, res) => {
     const user = await User.findById(req.user._id);
     user.password = undefined;
     user.resetCode = undefined;
-    console.log("===> ", user)
+    console.log("===> ", user);
     // res.json(user);
     return res.json({
       user,
@@ -289,7 +303,7 @@ export const adminUpdateUser = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    const user = await User.find({})
+    const user = await User.find({});
 
     user.password = undefined;
     user.resetCode = undefined;
@@ -302,4 +316,4 @@ export const getAllUsers = async (req, res) => {
       return res.status(403).json({ error: "Unauhorized" });
     }
   }
-}
+};

@@ -23,6 +23,7 @@ import AdminEditUser from "./pages/admin/EditUser.js";
 import Payment from "./pages/user/Payment.js";
 import PaymentReturn from "./pages/user/PaymentReturn.js";
 import LearningPathPage from "./pages/LearningPathPage.js";
+import AccountActive from "./pages/auth/AccountActive.js";
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 // <!-- Link trực tiếp từ Google Fonts -->
@@ -43,6 +44,9 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/CourseDetails/:idCourse" element={<DetailCourse />} />
           <Route path="/learning" element={<LearningPathPage />} />
+          <Route path="/auth/account-active/:token" element={<AccountActive />} />
+
+
           <Route path="/" element={<PrivateRoute />}>
             <Route path="profile/:idUser" element={<UserProfile />} />
             <Route path="dashboard" element={<Dashboard />} />

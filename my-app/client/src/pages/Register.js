@@ -1,15 +1,12 @@
 import {useState} from 'react'
 import axios from 'axios'
 import toast from "react-hot-toast";
-import { useAuth } from '../context/auth'
 import { useNavigate } from 'react-router-dom'
 
 export default function Register() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [phone, setPhone] = useState('');
-    const [ auth , setAuth ] = useAuth();
     const [loading , setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -19,10 +16,9 @@ export default function Register() {
       try {
         // console.log(email, password);
         setLoading(true)
-        const { data } = await axios.post('/register', {
+        const { data } = await axios.post('/pre-register', {
           email,
           password,
-          phone,
         });
         console.log(data);
         if (data?.error) {
@@ -31,10 +27,10 @@ export default function Register() {
         } else {
           setLoading(false)
           //save data to local storage
-          localStorage.setItem("auth", JSON.stringify(data));
+          // localStorage.setItem("auth", JSON.stringify(data));
           //save data to context
-          setAuth(data)
-          toast.success("Registered successfully");
+          // setAuth(data)
+          toast.success("Please check your gmail !");
           navigate('/')
         }
       } catch (err) {
@@ -71,15 +67,7 @@ export default function Register() {
                   value={password}
                   onChange={e =>setPassword(e.target.value) }
                 />
-                <input
-                  type="text"
-                  placeholder="Enter your phone"
-                  className="form-control mb-4"
-                  required
-                  // autoFocus
-                  value={phone}
-                  onChange={e =>setPhone(e.target.value) }
-                />
+
   
                   
                 <button disabled={loading}  className="btn btn-primary col-12 mb-4">{loading ? 'waiting ....' : 'Register'}</button>

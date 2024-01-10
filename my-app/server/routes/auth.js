@@ -5,7 +5,9 @@ import {requireSignin} from '../middlewares/auth.js'
 const router = express.Router();
 
 router.get('/',requireSignin, auth.welcome)
-// router.post('/pre-register', auth.run)
+
+router.post('/pre-register', auth.preRegisrer)
+
 router.post('/register', auth.register)
 
 router.post('/login', auth.login)
