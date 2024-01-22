@@ -84,7 +84,10 @@ export default function Login() {
             </form>
 
             <div className="d-flex justify-content-between">
-              <a className="text-danger pointer">Forgot Password</a>
+             
+              <Link to="/forgot-password" className="text-danger pointer">
+              Forgot Password
+              </Link>
               <Link to="/register" className="text-danger pointer">
                 Register now
               </Link>

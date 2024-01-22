@@ -32,6 +32,79 @@ export const welcome = (req, res) => {
   });
 };
 
+export const sendMailForm = async (email, content, token, route) => {
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: config.EMAIL_FROM, // Email người gửi
+      pass: config.EMAIL_PASS, // Mật khẩu hoặc mật khẩu ứng dụng
+    },
+  });
+
+  let mailOptions = {
+    from: "xuantuyenqwerty@gmail.com", // Địa chỉ email người gửi
+    to: email, // Email người nhận được từ request
+    subject: content,
+    // text: "Chào mừng bạn đã đăng ký thành công!",
+    html: `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>${content}!</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  h2 {
+    color: #333;
+  }
+  p {
+    margin-bottom: 15px;
+  }
+  .continue-button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .continue-button:hover {
+    background-color: #45a049;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Chào mừng bạn đã đến với website của chúng tôi !</h2>
+  <p>Xin chào <strong>${email}</strong>,</p>
+  <p>Cám ơn bạn đã sử dụng dịch vụ của chúng tôi. Thân ái !</p>
+  <p>Link chỉ tồn tại trong 5p.Hãy nhấn nút bên dưới để tiếp tục </p>
+  <a href="${config.CLIENT_URL}/auth/${route}/${token}" class="continue-button">Hoàn tất</a>
+</div>
+</body>
+</html>
+    `,
+  };
+  // account-active
+  await transporter.sendMail(mailOptions);
+};
+
 export const preRegisrer = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -44,78 +117,8 @@ export const preRegisrer = async (req, res) => {
     const token = jwt.sign({ email, password }, config.JWT_SECRET, {
       expiresIn: "1d",
     });
-    //send mail
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: config.EMAIL_FROM, // Email người gửi
-        pass: config.EMAIL_PASS, // Mật khẩu hoặc mật khẩu ứng dụng
-      },
-    });
 
-    let mailOptions = {
-      from: "xuantuyenqwerty@gmail.com", // Địa chỉ email người gửi
-      to: email, // Email người nhận được từ request
-      subject: "Đăng ký tài khoản thành công",
-      // text: "Chào mừng bạn đã đăng ký thành công!",
-      html: `
-      <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Chúc mừng bạn đã đăng ký thành công!</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      text-align: center;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    h2 {
-      color: #333;
-    }
-    p {
-      margin-bottom: 15px;
-    }
-    .continue-button {
-      padding: 10px 20px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .continue-button:hover {
-      background-color: #45a049;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Chào mừng bạn đã đến với website của chúng tôi !</h2>
-    <p>Xin chào <strong>${email}</strong>,</p>
-    <p>Cám ơn bạn đã đăng ký dịch vụ của chúng tôi. Thân ái !</p>
-    <p>Hãy nhấn nút bên dưới để tiếp tục đăng kí </p>
-    <a href="${config.CLIENT_URL}/auth/account-active/${token}" class="continue-button">Hoàn tất đăng kí</a>
-  </div>
-</body>
-</html>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
-
+    sendMailForm(email, "Đăng kí thành công", token, "account-active");
     res.json("Sent mail successfully");
   } catch (error) {
     console.log(error);
@@ -170,10 +173,43 @@ export const login = async (req, res) => {
   }
 };
 
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(email);
+    const user = await User.findOne({ email });
+    console.log(user);
+    if (!user) {
+      return res.status(400).json({ error: "not fought your email,register first !" });
+    }
+
+    const resetCode = nanoid();
+    user.resetCode = resetCode;
+    user.save();
+    console.log('resetcode:',user.resetCode);
+    const token = jwt.sign(resetCode, config.JWT_SECRET);
+
+    sendMailForm(email,'Yêu cầu thay đổi mật khẩu',token,'access-account')
+    res.json("Sent mail successfully");
+  } catch (error) {
+    console.log(error);
+    return res.json({ err: "Something went wrong !" });
+  }
+};
+
+export const accessAccount = async (req, res) => {
+  try {
+    const resetCode = jwt.verify(req.body.resetCode, config.JWT_SECRET);
+    const user = await User.findOneAndUpdate({ resetCode: resetCode },{resetCode: ''});
+    tokenAndUserResponse(req, res, user);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ err: "Something went wrong !" });
+  }
+};
+
 export const refreshToken = async (req, res) => {
   try {
-    console.log("you hit refresh token endpoint => ", req.headers);
-
     const { _id } = jwt.verify(req.headers.refresh_token, config.JWT_SECRET);
 
     const user = await User.findById(_id);

@@ -24,8 +24,12 @@ import Payment from "./pages/user/Payment.js";
 import PaymentReturn from "./pages/user/PaymentReturn.js";
 import LearningPathPage from "./pages/LearningPathPage.js";
 import AccountActive from "./pages/auth/AccountActive.js";
+import ForgotPassword from "./pages/ForgotPassword.js";
+import AccessAccount from "./pages/auth/AccessAccount.js";
+import ChangePassword from "./pages/user/ChangePassword.js";
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+
 // <!-- Link trực tiếp từ Google Fonts -->
 <link
   rel="stylesheet"
@@ -42,13 +46,16 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          
           <Route path="/CourseDetails/:idCourse" element={<DetailCourse />} />
           <Route path="/learning" element={<LearningPathPage />} />
           <Route path="/auth/account-active/:token" element={<AccountActive />} />
-
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/access-account/:token" element={<AccessAccount />} />
 
           <Route path="/" element={<PrivateRoute />}>
             <Route path="profile/:idUser" element={<UserProfile />} />
+            <Route path="profile/changePassword" element={<ChangePassword />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="Payment" element={<Payment />} />
             <Route path="vnpay_return" element={<PaymentReturn />} />

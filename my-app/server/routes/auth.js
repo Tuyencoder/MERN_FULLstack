@@ -14,6 +14,10 @@ router.post('/login', auth.login)
 
 router.get("/current-user", requireSignin, auth.currentUser);
 
+router.post('/forgot-password', auth.forgotPassword)
+
+router.post('/access-account', auth.accessAccount)
+
 router.get("/profile/:username", auth.publicProfile);
 
 router.put("/update-password", requireSignin, auth.updatePassword);

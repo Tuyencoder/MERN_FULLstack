@@ -3,7 +3,7 @@ import axios from "axios";
 import { Container, Form, Button } from "react-bootstrap";
 import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link,useNavigate, useParams } from "react-router-dom";
 
 const UserProfile = () => {
   const [username, setUsername] = useState("");
@@ -114,6 +114,9 @@ const UserProfile = () => {
         <Button className="mt-4" variant="primary" type="submit">
           Update Profile
         </Button>
+        <Link to="/profile/changePassword"  variant="primary" className="pointer">
+          Change Your Password
+        </Link>
       </Form>
     </Container>
   );
